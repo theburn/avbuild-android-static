@@ -1,6 +1,9 @@
 It's a tool to build ffmpeg for almost all platforms.
 
 
+### CHANGELOG
+
+#### 2020-04-08 
 avbuild-android-static
 
 1. update avbuild.sh , use -static
