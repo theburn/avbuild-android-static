@@ -37,7 +37,7 @@ test -f $USER_CONFIG &&  . $USER_CONFIG
 # TODO: use USER_OPT only
 # set NDK_ROOT if compile for android
 : ${NDK_ROOT:="$ANDROID_NDK"}
-: ${LIB_OPT:="--enable-shared"}
+: ${LIB_OPT:="--disable-shared --enable-static"}
 #: ${FEATURE_OPT:="--enable-hwaccels"}
 : ${DEBUG_OPT:="--disable-debug"}
 : ${FORCE_LTO:=false}
@@ -720,7 +720,7 @@ setup_mingw_env() {
   enable_libmfx
   enable_opt dxva2
   disable_opt iconv
-  EXTRA_LDFLAGS+=" -static-libgcc -Wl,-Bstatic"
+  EXTRA_LDFLAGS+=" -static-libgcc -Wl,-Bstatic -static"
   INSTALL_DIR="${INSTALL_DIR}-mingw-$1-gcc"
   rm -rf $THIS_DIR/build_$INSTALL_DIR/.env.sh
   mkdir -p $THIS_DIR/build_$INSTALL_DIR
@@ -755,9 +755,9 @@ setup_android_env() {
   local UNIFIED_SYSROOT="$NDK_ROOT/sysroot"
   [ -d "$UNIFIED_SYSROOT" ] || UNIFIED_SYSROOT=
   add_elf_flags
-  EXTRA_CFLAGS+=" -ffast-math -fstrict-aliasing"
+  EXTRA_CFLAGS+=" -ffast-math -fstrict-aliasing -Bstatic"
 # -no-canonical-prefixes: results in "-mcpu= ", why?
-  EXTRA_LDFLAGS+=" -Wl,-z,relro -Wl,-z,now"
+  EXTRA_LDFLAGS+=" -Wl,-z,relro -Wl,-z,now -Bstatic"
   TRY_FIX_CORTEX_A8=false
   # TODO: clang lto in r14 (gcc?) except aarch64
   if [ -z "${ANDROID_ARCH/*86/}" ]; then
@@ -889,7 +889,7 @@ use armv6t2 or -mthumb-interwork: https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/A
     fi
   fi
   #test -d $ANDROID_GCC_DIR || $NDK_ROOT/build/tools/make-standalone-toolchain.sh --platform=android-$API_LEVEL --toolchain=$TOOLCHAIN --install-dir=$ANDROID_GCC_DIR #--system=linux-x86_64
-  TOOLCHAIN_OPT+=" --extra-ldexeflags=\"-Wl,--gc-sections -Wl,-z,nocopyreloc -pie -fPIE $EXE_FLAGS\""
+  TOOLCHAIN_OPT+=" --extra-ldexeflags=\"-Wl,--gc-sections -Wl,-z,nocopyreloc -pie -fPIE -Bstatic $EXE_FLAGS\""
   INSTALL_DIR=sdk-android-${1:-${ANDROID_ARCH}}
   $IS_CLANG && INSTALL_DIR="${INSTALL_DIR}-clang" || INSTALL_DIR="${INSTALL_DIR}-gcc"
   enable_opt jni mediacodec
@@ -1207,8 +1207,8 @@ setup_linux_env() {
 config1(){
   local TAGET_FLAG=$1
   local TAGET_ARCH_FLAG=$2
-  local EXTRA_LDFLAGS=$EXTRA_LDFLAGS
-  local EXTRA_CFLAGS=$EXTRA_CFLAGS
+  local EXTRA_LDFLAGS="$EXTRA_LDFLAGS"
+  local EXTRA_CFLAGS="$EXTRA_CFLAGS"
   local FEATURE_OPT=$FEATURE_OPT
   local TOOLCHAIN_OPT=$TOOLCHAIN_OPT
   local LIB_OPT=$LIB_OPT

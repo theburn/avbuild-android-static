@@ -1,5 +1,16 @@
 It's a tool to build ffmpeg for almost all platforms.
 
+
+avbuild-android-static
+
+1. update avbuild.sh , use -static
+2. add env.sh
+3. directory (set in env.sh)
+    * android-ndk-r17b
+    * avbuild-android-static
+    * ffmpeg-4.2.2
+
+
 How: https://github.com/wang-bin/avbuild/wiki
 
 ### Download prebuilt packages
